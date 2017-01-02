@@ -8,7 +8,7 @@ neural_network::neural_network(std::vector<uint32_t> sizes)
   biases_.reserve(sizes_.size() - 1);
   for (auto i = 1; i < sizes_.size(); ++i) {
     vector b(sizes_[i], 1);
-    for (auto j = 0; j < sizes_[i]; ++j) {
+    for (auto j = 0; j < b.rows(); ++j) {
       b(j) = randn(gen_);
     }
     biases_.emplace_back(std::move(b));
@@ -16,8 +16,8 @@ neural_network::neural_network(std::vector<uint32_t> sizes)
   weights_.reserve(sizes_.size() - 1);
   for (auto i = 0; i < sizes_.size() - 1; ++i) {
     matrix w(sizes_[i + 1], sizes_[i]);
-    for (auto j = 0; j < sizes_[i + 1]; ++j) {
-      for (auto k = 0; k < sizes_[i]; ++k) {
+    for (auto j = 0; j < w.rows(); ++j) {
+      for (auto k = 0; k < w.cols(); ++k) {
         w(j, k) = randn(gen_);
       }
     }
@@ -34,7 +34,7 @@ vector neural_network::feedforward(vector a) const {
 
 void neural_network::sgd_train(data_set& training_data, uint32_t epochs,
                                uint32_t mini_batch_size, double eta,
-                               evaluator f /* = evaluator() */) {
+                               evaluator f/* = evaluator() */) {
   for (auto i = 0; i < epochs; ++i) {
     std::shuffle(training_data.begin(), training_data.end(), gen_);
     for (auto j = 0; j < training_data.size(); j += mini_batch_size) {
@@ -93,11 +93,7 @@ neural_network::backprop(vector activation, const vector& label) {
     as.emplace_back(activation);
     dss.emplace_back(dsigmoid(activation));
   }
-  auto delta = as.back();
-  delta -= label;
-  for (auto i = 0; i < delta.rows(); ++i) {
-    delta(i) *= dss.back()(i);
-  }
+  vector delta = (as.back() - label).cwiseProduct(dss.back());
   std::vector<vector> nabla_b;
   nabla_b.reserve(biases_.size());
   for (auto& b: biases_) {
@@ -111,10 +107,8 @@ neural_network::backprop(vector activation, const vector& label) {
   }
   nabla_w.back() = delta * (as.end() - 2)->transpose();
   for (auto i = 2; i < sizes_.size(); ++i) {
-    delta = (weights_.end() - i + 1)->transpose() * delta;
-    for (auto j = 0; j < delta.rows(); ++j) {
-      delta(j) *= (*(dss.end() - i))(j);
-    }
+    delta = ((weights_.end() - i + 1)->transpose() * delta)
+              .cwiseProduct(*(dss.end() - i));
     *(nabla_b.end() - i) = delta;
     *(nabla_w.end() - i) = delta * (as.end() - i - 1)->transpose();
   }
