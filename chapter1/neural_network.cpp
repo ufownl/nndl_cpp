@@ -27,7 +27,7 @@ neural_network::neural_network(std::vector<uint32_t> sizes)
 
 vector neural_network::feedforward(vector a) const {
   for (auto i = 0; i < sizes_.size() - 1; ++i) {
-    a = sigmoid(weights_[i] * a + biases_[i]);
+    a = (weights_[i] * a + biases_[i]).unaryExpr(std::ptr_fun(sigmoid));
   }
   return a;
 }
@@ -88,10 +88,10 @@ neural_network::backprop(vector activation, const vector& label) {
   std::vector<vector> dzs;
   dzs.reserve(sizes_.size() - 1);
   for (auto i = 0; i < sizes_.size() - 1; ++i) {
-    auto z = weights_[i] * activation + biases_[i];
-    activation = sigmoid(z);
+    activation = (weights_[i] * activation + biases_[i])
+                   .unaryExpr(std::ptr_fun(sigmoid));
     as.emplace_back(activation);
-    dzs.emplace_back(dsigmoid(activation));
+    dzs.emplace_back(activation.unaryExpr(std::ptr_fun(dsigmoid)));
   }
   vector delta = (as.back() - label).cwiseProduct(dzs.back());
   std::vector<vector> nabla_b;
