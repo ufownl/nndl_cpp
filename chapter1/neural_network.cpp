@@ -85,15 +85,15 @@ neural_network::backprop(vector activation, const vector& label) {
   std::vector<vector> as;
   as.reserve(sizes_.size());
   as.emplace_back(activation);
-  std::vector<vector> dss;
-  dss.reserve(sizes_.size() - 1);
+  std::vector<vector> dzs;
+  dzs.reserve(sizes_.size() - 1);
   for (auto i = 0; i < sizes_.size() - 1; ++i) {
     auto z = weights_[i] * activation + biases_[i];
     activation = sigmoid(z);
     as.emplace_back(activation);
-    dss.emplace_back(dsigmoid(activation));
+    dzs.emplace_back(dsigmoid(activation));
   }
-  vector delta = (as.back() - label).cwiseProduct(dss.back());
+  vector delta = (as.back() - label).cwiseProduct(dzs.back());
   std::vector<vector> nabla_b;
   nabla_b.reserve(biases_.size());
   for (auto& b: biases_) {
@@ -108,7 +108,7 @@ neural_network::backprop(vector activation, const vector& label) {
   nabla_w.back() = delta * (as.end() - 2)->transpose();
   for (auto i = 2; i < sizes_.size(); ++i) {
     delta = ((weights_.end() - i + 1)->transpose() * delta)
-              .cwiseProduct(*(dss.end() - i));
+              .cwiseProduct(*(dzs.end() - i));
     *(nabla_b.end() - i) = delta;
     *(nabla_w.end() - i) = delta * (as.end() - i - 1)->transpose();
   }
