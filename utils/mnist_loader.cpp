@@ -64,15 +64,3 @@ data_set mnist_data_set(const mnist_images& images,
   }
   return data;
 }
-
-uint8_t mnist_decode_result(const vector& x) {
-  auto max_val = 0.0;
-  auto max_idx = 0;
-  for (auto i = 0; i < x.rows(); ++i) {
-    if (x(i) > max_val) {
-      max_val = x(i);
-      max_idx = i;
-    }
-  }
-  return max_idx;
-}

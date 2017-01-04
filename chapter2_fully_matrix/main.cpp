@@ -1,6 +1,6 @@
 #include "neural_network.hpp"
 #include <utils/mnist_loader.hpp>
-#include <iostream>
+#include <utils/mnist_evaluator.hpp>
 
 namespace {
 
@@ -35,17 +35,6 @@ int main() {
   std::cerr << "Complete!" << std::endl;
   neural_network nn({784u, 30u, 10u});
   nn.sgd_train(training_data, 30u, 10u, 3.0,
-    [&test_data](const neural_network& self, uint32_t epoch) {
-      auto result = 0u;
-      for (auto i = test_data.begin(); i != test_data.end(); ++i) {
-        auto out = self.feedforward(i->first);
-        if (mnist_decode_result(out) == mnist_decode_result(i->second)) {
-          ++result;
-        }
-      }
-      std::cerr << "Epoch " << epoch << ": "
-                << result << " / " << test_data.size() << std::endl;
-    }
-  );
+               mnist_evaluator<neural_network>(test_data));
   return 0;
 }
