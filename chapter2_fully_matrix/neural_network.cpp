@@ -62,14 +62,14 @@ void neural_network::update_mini_batch(data_set::const_iterator it0,
   }
   auto nabla = backprop(activation, label);
   for (auto i = 0; i < biases_.size(); ++i) {
-    biases_[i] -= eta / batch_size * nabla.first[i].rowwise().sum();
+    biases_[i] -= eta / batch_size * nabla.first[i];
   }
   for (auto i = 0; i < weights_.size(); ++i) {
     weights_[i] -= eta / batch_size * nabla.second[i];
   }
 }
 
-std::pair<std::vector<matrix>, std::vector<matrix>>
+std::pair<std::vector<vector>, std::vector<matrix>>
 neural_network::backprop(matrix activation, const matrix& label) {
   std::vector<matrix> as;
   as.reserve(sizes_.size());
@@ -83,12 +83,12 @@ neural_network::backprop(matrix activation, const matrix& label) {
     dzs.emplace_back(activation.unaryExpr(std::ptr_fun(dsigmoid)));
   }
   matrix delta = (as.back() - label).cwiseProduct(dzs.back());
-  std::vector<matrix> nabla_b;
+  std::vector<vector> nabla_b;
   nabla_b.reserve(biases_.size());
   for (auto& b: biases_) {
-    nabla_b.emplace_back(matrix::Zero(b.rows(), delta.cols()));
+    nabla_b.emplace_back(vector::Zero(b.rows(), b.cols()));
   }
-  nabla_b.back() = delta;
+  nabla_b.back() = delta.rowwise().sum();
   std::vector<matrix> nabla_w;
   nabla_w.reserve(weights_.size());
   for (auto& w: weights_) {
@@ -98,7 +98,7 @@ neural_network::backprop(matrix activation, const matrix& label) {
   for (auto i = 2; i < sizes_.size(); ++i) {
     delta = ((weights_.end() - i + 1)->transpose() * delta)
               .cwiseProduct(*(dzs.end() - i));
-    *(nabla_b.end() - i) = delta;
+    *(nabla_b.end() - i) = delta.rowwise().sum();
     *(nabla_w.end() - i) = delta * (as.end() - i - 1)->transpose();
   }
   return {std::move(nabla_b), std::move(nabla_w)};

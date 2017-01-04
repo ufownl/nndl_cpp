@@ -20,7 +20,7 @@ public:
 private:
   void update_mini_batch(data_set::const_iterator it0,
                          data_set::const_iterator it1, double eta);
-  std::pair<std::vector<matrix>, std::vector<matrix>>
+  std::pair<std::vector<vector>, std::vector<matrix>>
   backprop(matrix activation, const matrix& label);
 
   std::random_device rd_;
