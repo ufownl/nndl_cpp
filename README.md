@@ -1,5 +1,5 @@
 # nndl_cpp
-The code samples of "Neural Networks and Deep Learning" by C++11.
+The code samples of ["Neural Networks and Deep Learning"](http://neuralnetworksanddeeplearning.com/) by C++11.
 
 # Usage
 ```
