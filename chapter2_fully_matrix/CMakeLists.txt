@@ -1,4 +1,0 @@
-aux_source_directory(. NNDL_CHAPTER2_FULLY_MATRIX_SOURCES)
-add_executable(nndl_chapter2_fully_matrix ${NNDL_CHAPTER2_FULLY_MATRIX_SOURCES})
-target_link_libraries(nndl_chapter2_fully_matrix nndl_utils)
-add_dependencies(nndl_chapter2_fully_matrix nndl_utils)
