@@ -22,3 +22,4 @@ include_directories(
 add_subdirectory(utils)
 add_subdirectory(chapter1)
 add_subdirectory(chapter2)
+add_subdirectory(chapter3)
