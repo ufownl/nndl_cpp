@@ -14,12 +14,13 @@ public:
 
   vector feedforward(vector a) const;
   void sgd_train(data_set& training_data, uint32_t epochs,
-                 uint32_t mini_batch_size, double eta,
+                 uint32_t mini_batch_size, double eta, double lambda,
                  evaluator f = evaluator());
 
 private:
   void update_mini_batch(data_set::const_iterator it0,
-                         data_set::const_iterator it1, double eta);
+                         data_set::const_iterator it1, size_t total_size,
+                         double eta, double lambda);
   std::pair<std::vector<vector>, std::vector<matrix>>
   backprop(matrix activation, const matrix& label);
 
