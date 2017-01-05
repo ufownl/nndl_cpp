@@ -17,8 +17,8 @@ mnist_labels load_labels() {
 std::pair<data_set, data_set> make_data_set(const mnist_images& images,
                                             const mnist_labels& labels) {
   data_set training_data =
-    mnist_data_set(mnist_images(images.begin(), images.begin() + 1000),
-                   mnist_labels(labels.begin(), labels.begin() + 1000));
+    mnist_data_set(mnist_images(images.begin(), images.begin() + 50000),
+                   mnist_labels(labels.begin(), labels.begin() + 50000));
   data_set test_data =
     mnist_data_set(mnist_images(images.begin() + 50000, images.end()),
                    mnist_labels(labels.begin() + 50000, labels.end()));
@@ -34,7 +34,7 @@ int main() {
   auto test_data = std::move(data.second);
   std::cerr << "Complete!" << std::endl;
   neural_network nn({784u, 30u, 10u});
-  nn.sgd_train(training_data, 400u, 10u, 0.5, 0.1,
+  nn.sgd_train(training_data, 30u, 10u, 0.5, 5.0,
                mnist_evaluator<neural_network>(test_data));
   return 0;
 }
