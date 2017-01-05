@@ -11,4 +11,7 @@ cmake ..
 make
 cd bin
 ./nndl_chapter1
+./nndl_chapter2
+./nndl_chapter3
+...
 ```
