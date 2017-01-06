@@ -33,8 +33,8 @@ int main() {
   auto training_data = std::move(data.first);
   auto test_data = std::move(data.second);
   std::cerr << "Complete!" << std::endl;
-  neural_network nn({784u, 30u, 10u});
-  nn.sgd_train(training_data, 30u, 10u, 0.5, 5.0,
+  neural_network nn({784u, 100u, 10u});
+  nn.sgd_train(training_data, 60u, 10u, 0.1, 5.0,
                mnist_evaluator<neural_network>(test_data));
   return 0;
 }
