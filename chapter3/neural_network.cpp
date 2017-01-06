@@ -4,17 +4,23 @@
 
 neural_network::neural_network(std::vector<uint32_t> sizes)
   : sizes_(std::move(sizes)) {
-  std::normal_distribution<> randn;
-  auto op = [&](double x) {
-    return x + randn(gen_);
-  };
+  std::normal_distribution<> randn_biase;
   biases_.reserve(sizes_.size() - 1);
   for (auto i = 1; i < sizes_.size(); ++i) {
-    biases_.emplace_back(vector::Zero(sizes_[i], 1).unaryExpr(op));
+    biases_.emplace_back(vector::Zero(sizes_[i], 1).unaryExpr(
+      [&](double x) {
+        return x + randn_biase(gen_);
+      }
+    ));
   }
   weights_.reserve(sizes_.size() - 1);
   for (auto i = 0; i < sizes_.size() - 1; ++i) {
-    weights_.emplace_back(matrix::Zero(sizes_[i + 1], sizes_[i]).unaryExpr(op));
+    std::normal_distribution<> randn_weight(0.0, 1.0 / sqrt(sizes_[i]));
+    weights_.emplace_back(matrix::Zero(sizes_[i + 1], sizes_[i]).unaryExpr(
+      [&](double x) {
+        return x + randn_weight(gen_);
+      }
+    ));
   }
 }
 
