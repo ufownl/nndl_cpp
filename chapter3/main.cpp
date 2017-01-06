@@ -14,6 +14,16 @@ mnist_labels load_labels() {
   return mnist_load_labels(in);
 }
 
+mnist_images load_validation_images() {
+  std::ifstream in("../../data/t10k-images-idx3-ubyte", std::ios::binary);
+  return mnist_load_images(in);
+}
+
+mnist_labels load_validation_labels() {
+  std::ifstream in("../../data/t10k-labels-idx1-ubyte", std::ios::binary);
+  return mnist_load_labels(in);
+}
+
 std::pair<data_set, data_set> make_data_set(const mnist_images& images,
                                             const mnist_labels& labels) {
   data_set training_data =
@@ -32,9 +42,11 @@ int main() {
   auto data = make_data_set(load_images(), load_labels());
   auto training_data = std::move(data.first);
   auto test_data = std::move(data.second);
+  auto validation_data = mnist_data_set(load_validation_images(),
+                                        load_validation_labels());
   std::cerr << "Complete!" << std::endl;
   neural_network nn({784u, 100u, 10u});
   nn.sgd_train(training_data, 60u, 10u, 0.1, 5.0,
-               mnist_evaluator<neural_network>(test_data));
+               mnist_evaluator<neural_network>(validation_data));
   return 0;
 }
