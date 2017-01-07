@@ -47,6 +47,6 @@ int main() {
   std::cerr << "Complete!" << std::endl;
   neural_network nn({784u, 100u, 10u});
   nn.sgd_train(training_data, 60u, 10u, 0.1, 5.0,
-               mnist_evaluator<neural_network>(validation_data));
+               mnist_early_stopping<neural_network>(validation_data, 10u));
   return 0;
 }

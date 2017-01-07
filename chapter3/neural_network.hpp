@@ -8,7 +8,7 @@
 class neural_network {
 public:
   using evaluator =
-    std::function<void(const neural_network&, uint32_t)>;
+    std::function<bool(const neural_network&, uint32_t)>;
 
   neural_network(std::vector<uint32_t> sizes);
 

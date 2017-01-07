@@ -43,8 +43,8 @@ void neural_network::sgd_train(data_set& training_data, uint32_t epochs,
                                                    : training_data.end();
       update_mini_batch(it0, it1, training_data.size(), eta, lambda);
     }
-    if (f) {
-      f(*this, i);
+    if (f && f(*this, i)) {
+      break;
     }
   }
 }
