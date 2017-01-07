@@ -1,6 +1,7 @@
 #include "neural_network.hpp"
 #include <utils/mnist_loader.hpp>
 #include <utils/mnist_evaluator.hpp>
+#include <limits>
 
 namespace {
 
@@ -70,7 +71,8 @@ int main() {
   for (learning_rate_scheduler eta(0.1); eta.div() <= 128u; ) {
     auto learning_rate = eta();
     std::cerr << "Learning rate: " << learning_rate << std::endl;
-    nn.sgd_train(training_data, 60u, 10u, learning_rate, 5.0, 0.5,
+    nn.sgd_train(training_data, std::numeric_limits<uint32_t>::max(),
+                 50u, learning_rate, 5.0, 0.8,
                  mnist_early_stopping<neural_network>(validation_data, 10u));
   }
   return 0;
