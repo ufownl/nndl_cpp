@@ -70,7 +70,7 @@ int main() {
   for (learning_rate_scheduler eta(0.1); eta.div() <= 128u; ) {
     auto learning_rate = eta();
     std::cerr << "Learning rate: " << learning_rate << std::endl;
-    nn.sgd_train(training_data, 60u, 10u, learning_rate, 5.0,
+    nn.sgd_train(training_data, 60u, 10u, learning_rate, 5.0, 0.5,
                  mnist_early_stopping<neural_network>(validation_data, 10u));
   }
   return 0;

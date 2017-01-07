@@ -23,6 +23,10 @@ neural_network::neural_network(std::vector<uint32_t> sizes)
       }
     ));
   }
+  velocities_.reserve(sizes_.size() - 1);
+  for (auto i = 0; i < sizes_.size() - 1; ++i) {
+    velocities_.emplace_back(matrix::Zero(sizes_[i + 1], sizes_[i]));
+  }
 }
 
 vector neural_network::feedforward(vector a) const {
@@ -34,7 +38,8 @@ vector neural_network::feedforward(vector a) const {
 
 void neural_network::sgd_train(data_set& training_data, uint32_t epochs,
                                uint32_t mini_batch_size, double eta,
-                               double lambda, evaluator f/* = evaluator() */) {
+                               double lambda, double mu,
+                               evaluator f/* = evaluator() */) {
   for (auto i = 0; i < epochs; ++i) {
     std::shuffle(training_data.begin(), training_data.end(), rand_gen_);
     for (auto j = 0; j < training_data.size(); j += mini_batch_size) {
@@ -42,7 +47,7 @@ void neural_network::sgd_train(data_set& training_data, uint32_t epochs,
       auto it1 =
         j + mini_batch_size < training_data.size() ? it0 + mini_batch_size
                                                    : training_data.end();
-      update_mini_batch(it0, it1, training_data.size(), eta, lambda);
+      update_mini_batch(it0, it1, training_data.size(), eta, lambda, mu);
     }
     if (f && f(*this, i)) {
       break;
@@ -53,7 +58,7 @@ void neural_network::sgd_train(data_set& training_data, uint32_t epochs,
 void neural_network::update_mini_batch(data_set::const_iterator it0,
                                        data_set::const_iterator it1,
                                        size_t total_size, double eta,
-                                       double lambda) {
+                                       double lambda, double mu) {
   auto batch_size = it1 - it0;
   matrix activation(sizes_.front(), batch_size);
   matrix label(sizes_.back(), batch_size);
@@ -66,8 +71,10 @@ void neural_network::update_mini_batch(data_set::const_iterator it0,
     biases_[i] -= eta / batch_size * nabla.first[i];
   }
   for (auto i = 0; i < weights_.size(); ++i) {
+    velocities_[i] *= mu;
+    velocities_[i] -= eta / batch_size * nabla.second[i];
     weights_[i] *= 1.0 - eta * lambda / total_size;
-    weights_[i] -= eta / batch_size * nabla.second[i];
+    weights_[i] += velocities_[i];
   }
 }
 
