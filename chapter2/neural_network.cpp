@@ -3,10 +3,11 @@
 #include <algorithm>
 
 neural_network::neural_network(std::vector<uint32_t> sizes)
-  : sizes_(std::move(sizes)) {
+  : rand_gen_(std::random_device{}())
+  , sizes_(std::move(sizes)) {
   std::normal_distribution<> randn;
   auto op = [&](double x) {
-    return x + randn(gen_);
+    return x + randn(rand_gen_);
   };
   biases_.reserve(sizes_.size() - 1);
   for (auto i = 1; i < sizes_.size(); ++i) {
@@ -29,7 +30,7 @@ void neural_network::sgd_train(data_set& training_data, uint32_t epochs,
                                uint32_t mini_batch_size, double eta,
                                evaluator f/* = evaluator() */) {
   for (auto i = 0; i < epochs; ++i) {
-    std::shuffle(training_data.begin(), training_data.end(), gen_);
+    std::shuffle(training_data.begin(), training_data.end(), rand_gen_);
     for (auto j = 0; j < training_data.size(); j += mini_batch_size) {
       auto it0 = training_data.begin() + j;
       auto it1 =

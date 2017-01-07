@@ -1,5 +1,5 @@
-#ifndef NNDL_CHAPTER1_NEURAL_NETWORK_HPP
-#define NNDL_CHAPTER1_NEURAL_NETWORK_HPP
+#ifndef NNDL_CHAPTER2_NEURAL_NETWORK_HPP
+#define NNDL_CHAPTER2_NEURAL_NETWORK_HPP
 
 #include <utils/types.hpp>
 #include <functional>
@@ -23,11 +23,10 @@ private:
   std::pair<std::vector<vector>, std::vector<matrix>>
   backprop(matrix activation, const matrix& label);
 
-  std::random_device rd_;
-  std::mt19937 gen_ {rd_()};
+  std::mt19937 rand_gen_;
   std::vector<uint32_t> sizes_;
   std::vector<vector> biases_;
   std::vector<matrix> weights_;
 };
 
-#endif  // NNDL_CHAPTER1_NEURAL_NETWORK_HPP
+#endif  // NNDL_CHAPTER2_NEURAL_NETWORK_HPP

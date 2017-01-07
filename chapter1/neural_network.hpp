@@ -23,8 +23,7 @@ private:
   std::pair<std::vector<vector>, std::vector<matrix>>
   backprop(vector activation, const vector& label);
 
-  std::random_device rd_;
-  std::mt19937 gen_ {rd_()};
+  std::mt19937 rand_gen_;
   std::vector<uint32_t> sizes_;
   std::vector<vector> biases_;
   std::vector<matrix> weights_;
