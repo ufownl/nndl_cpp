@@ -24,9 +24,6 @@ neural_network::neural_network(std::vector<uint32_t> sizes)
     ));
   }
   velocities_.reserve(sizes_.size() - 1);
-  for (auto i = 0; i < sizes_.size() - 1; ++i) {
-    velocities_.emplace_back(matrix::Zero(sizes_[i + 1], sizes_[i]));
-  }
 }
 
 vector neural_network::feedforward(vector a) const {
@@ -40,6 +37,10 @@ void neural_network::sgd_train(data_set& training_data, uint32_t epochs,
                                uint32_t mini_batch_size, double eta,
                                double lambda, double mu,
                                evaluator f/* = evaluator() */) {
+  velocities_.clear();
+  for (auto i = 0; i < sizes_.size() - 1; ++i) {
+    velocities_.emplace_back(matrix::Zero(sizes_[i + 1], sizes_[i]));
+  }
   for (auto i = 0; i < epochs; ++i) {
     std::shuffle(training_data.begin(), training_data.end(), rand_gen_);
     for (auto j = 0; j < training_data.size(); j += mini_batch_size) {
