@@ -5,6 +5,8 @@
 #include <iostream>
 #include <chrono>
 
+uint8_t mnist_decode_result(const vector& x);
+
 template <class T, class R = void>
 class mnist_evaluator {
 public:
@@ -33,12 +35,6 @@ public:
   }
 
 private:
-  static uint8_t mnist_decode_result(const vector& x) {
-    auto max_idx = 0;
-    x.maxCoeff(&max_idx);
-    return max_idx;
-  }
-
   const data_set& test_data_;
   std::chrono::time_point<std::chrono::high_resolution_clock> prev_;
 };
@@ -76,12 +72,6 @@ public:
   }
 
 private:
-  static uint8_t mnist_decode_result(const vector& x) {
-    auto max_idx = 0;
-    x.maxCoeff(&max_idx);
-    return max_idx;
-  }
-
   const data_set& test_data_;
   uint32_t stop_n_;
   uint32_t max_result_ {0};

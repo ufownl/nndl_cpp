@@ -35,6 +35,27 @@ std::pair<data_set, data_set> make_data_set(const mnist_images& images,
   return {std::move(training_data), std::move(test_data)};
 }
 
+class learning_rate_scheduler {
+public:
+  learning_rate_scheduler(double eta) : eta_(eta) {
+    // nop
+  }
+
+  double operator()() {
+    auto res = eta_ / div_;
+    div_ <<= 1u;
+    return res;
+  }
+
+  uint32_t div() const {
+    return div_;
+  }
+
+private:
+  double eta_;
+  uint32_t div_ = 1u;
+};
+
 }
 
 int main() {
@@ -46,7 +67,11 @@ int main() {
                                         load_validation_labels());
   std::cerr << "Complete!" << std::endl;
   neural_network nn({784u, 100u, 10u});
-  nn.sgd_train(training_data, 60u, 10u, 0.1, 5.0,
-               mnist_early_stopping<neural_network>(validation_data, 10u));
+  for (learning_rate_scheduler eta(0.1); eta.div() <= 128u; ) {
+    auto learning_rate = eta();
+    std::cerr << "Learning rate: " << learning_rate << std::endl;
+    nn.sgd_train(training_data, 60u, 10u, learning_rate, 5.0,
+                 mnist_early_stopping<neural_network>(validation_data, 10u));
+  }
   return 0;
 }
