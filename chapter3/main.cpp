@@ -68,7 +68,7 @@ int main() {
                                         load_validation_labels());
   std::cerr << "Complete!" << std::endl;
   neural_network nn({784u, 100u, 10u});
-  for (learning_rate_scheduler eta(0.1); eta.div() <= 128u; ) {
+  for (learning_rate_scheduler eta(0.5); eta.div() <= 128u; ) {
     auto learning_rate = eta();
     std::cerr << "Learning rate: " << learning_rate << std::endl;
     nn.sgd_train(training_data, std::numeric_limits<uint32_t>::max(),
