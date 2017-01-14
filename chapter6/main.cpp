@@ -26,9 +26,9 @@ using neural_network =
 int main() {
   std::cerr << "Loading MNIST data..." << std::endl;
   std::vector<dlib::matrix<unsigned char>> training_images;
-  std::vector<neural_network::label_type> training_labels;
+  std::vector<neural_network::training_label_type> training_labels;
   std::vector<dlib::matrix<unsigned char>> validation_images;
-  std::vector<neural_network::label_type> validation_labels;
+  std::vector<neural_network::output_label_type> validation_labels;
   dlib::load_mnist_dataset("../../data", training_images, training_labels,
                            validation_images, validation_labels);
   std::cerr << "Complete!" << std::endl;
