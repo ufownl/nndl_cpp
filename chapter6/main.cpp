@@ -1,3 +1,4 @@
+#include "loss_multiattr.hpp"
 #include <dlib/dnn.h>
 #include <dlib/data_io.h>
 #include <iostream>
@@ -21,16 +22,28 @@ using fully_connected_layer1 =
   dlib::relu<dlib::fc<84, fully_connected_layer0>>;
 
 using neural_network =
-  dlib::loss_multiclass_log<dlib::fc<10, fully_connected_layer1>>;
+  loss_multiattr<dlib::sig<dlib::fc<10, fully_connected_layer1>>>;
 
 int main() {
   std::cerr << "Loading MNIST data..." << std::endl;
   std::vector<dlib::matrix<unsigned char>> training_images;
-  std::vector<neural_network::training_label_type> training_labels;
+  std::vector<unsigned long> training_labels;
   std::vector<dlib::matrix<unsigned char>> validation_images;
-  std::vector<neural_network::output_label_type> validation_labels;
+  std::vector<unsigned long> validation_labels;
   dlib::load_mnist_dataset("../../data", training_images, training_labels,
                            validation_images, validation_labels);
+  std::vector<dlib::matrix<float>> labels;
+  for (auto& label: training_labels) {
+    dlib::matrix<float> mat(10, 1);
+    for (auto i = 0ul; i < 10; ++i) {
+      if (i == label) {
+        mat(i, 0) = 1.0f;
+      } else {
+        mat(i, 0) = 0.0f;
+      }
+    }
+    labels.emplace_back(std::move(mat));
+  }
   std::cerr << "Complete!" << std::endl;
   neural_network nn;
   dlib::dnn_trainer<neural_network> trainer(nn);
@@ -39,12 +52,12 @@ int main() {
   trainer.set_learning_rate(0.03);
   trainer.set_learning_rate_shrink_factor(0.5);
   trainer.be_verbose();
-  trainer.train(training_images, training_labels);
+  trainer.train(training_images, labels);
   auto predicted_labels = nn(validation_images);
   auto num_right = 0u;
   auto num_wrong = 0u;
   for (auto i = 0; i < validation_images.size(); ++i) {
-    if (predicted_labels[i] == validation_labels[i]) {
+    if (dlib::index_of_max(dlib::colm(predicted_labels[i], 0)) == validation_labels[i]) {
       ++num_right;
     } else {
       ++num_wrong;
