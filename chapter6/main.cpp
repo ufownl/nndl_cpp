@@ -32,14 +32,14 @@ int main() {
   std::vector<unsigned long> validation_labels;
   dlib::load_mnist_dataset("../../data", training_images, training_labels,
                            validation_images, validation_labels);
-  std::vector<dlib::matrix<float>> labels;
+  std::vector<dlib::matrix<float, 0, 1>> labels;
   for (auto& label: training_labels) {
-    dlib::matrix<float> mat(10, 1);
+    dlib::matrix<float, 0, 1> mat(10);
     for (auto i = 0ul; i < 10; ++i) {
       if (i == label) {
-        mat(i, 0) = 1.0f;
+        mat(i) = 1.0f;
       } else {
-        mat(i, 0) = 0.0f;
+        mat(i) = 0.0f;
       }
     }
     labels.emplace_back(std::move(mat));
